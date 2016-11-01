@@ -1,22 +1,21 @@
 ﻿using System;
 using SendInCorrespondence;
-using System.Configuration;
-using SendInCorrespondence.ICorrespondenceAgencyExternalBasic;
-
 
 namespace SendInCorrespondenceConsole
 {
+    /// <summary>
+    /// Console application for testing the SendInCorrespondence service
+    /// </summary>
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            InsertCorrespondenceV2 correspondence = SendInCorrespondenceDal.CreateCorrespondence();
-            SendInCorrespondenceDal.InsertCorrespondence(
-                ConfigurationManager.AppSettings["systemUserName"],
-                ConfigurationManager.AppSettings["systemPassword"],
-                ConfigurationManager.AppSettings["systemUserCode"],
-                Guid.NewGuid().ToString(),
-                correspondence);               
+            Console.WriteLine("Starting the create and send correspondence service...");
+
+            SendInCorrespondenceDal.CreateCorrespondence();
+
+            Console.WriteLine("Sending correspondence completed successfully!");
+            Console.ReadLine();
         }        
     }
 }

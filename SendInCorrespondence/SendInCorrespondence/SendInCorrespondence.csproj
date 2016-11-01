@@ -55,7 +55,9 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="SendInCorrespondence.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Service References\ICorrespondenceAgencyExternalBasic\CorrespondenceAgencyExternalBasicSF.wsdl" />
     <None Include="Service References\ICorrespondenceAgencyExternalBasic\SendInCorrespondence.ICorrespondenceAgencyExternalBasic.CorrespondenceServiceInfo.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>

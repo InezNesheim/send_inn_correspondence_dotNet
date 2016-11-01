@@ -4,10 +4,40 @@ using System.Configuration;
 
 namespace SendInCorrespondence
 {
+    /// <summary>
+    /// Dal class for initializing and sending in a correspondence via Altinn webservice.
+    /// </summary>
     public class SendInCorrespondenceDal
     {
-        public static void InsertCorrespondence(string systemUserName, string systemPassword, string systemUserCode,
-            string externalShipmentReferece, InsertCorrespondenceV2 correspondence)
+        /// <summary>
+        /// Initializes and sends a correspondence
+        /// </summary>
+        public static void CreateAndSendCorrespondence()
+        {
+            InsertCorrespondenceV2 correspondence;
+
+            try
+            {
+                correspondence = CreateCorrespondence();
+            }
+            catch (Exception)
+            {
+                //TODO:: log error - failed to initialize correspondence
+                throw;
+            }
+
+            SendCorrespondence(ConfigurationManager.AppSettings["systemUserName"], ConfigurationManager.AppSettings["systemPassword"], ConfigurationManager.AppSettings["systemUserCode"], Guid.NewGuid().ToString(), correspondence);
+        }
+
+        /// <summary>
+        /// Uses the ICorrespondenceAgencyExternalBasic web service for sending a correspondence
+        /// </summary>
+        /// <param name="systemUserName">User name for the system</param>
+        /// <param name="systemPassword">System password</param>
+        /// <param name="systemUserCode">User code for the system</param>
+        /// <param name="externalShipmentReferece">Unique value to identify the shipment</param>
+        /// <param name="correspondence">Correspondence to send</param>
+        public static void SendCorrespondence(string systemUserName, string systemPassword, string systemUserCode, string externalShipmentReferece, InsertCorrespondenceV2 correspondence)
         {
             ReceiptExternal receipt;
 
@@ -17,18 +47,27 @@ namespace SendInCorrespondence
                 {
                     receipt = client.InsertCorrespondenceBasicV2(systemUserName, systemPassword, systemUserCode, externalShipmentReferece, correspondence);
                     if (receipt.ReceiptStatusCode == ReceiptStatusEnum.OK)
-                        return;
-
-                    throw new Exception($"Error while sending correspondence: {receipt.ReceiptStatusCode}, {receipt.ReceiptText}");
+                    {
+                        //TODO:: log success and add business logic here
+                    }
+                    else
+                    {
+                        //TODO:: log error and add business logic here
+                        throw new Exception($"Error while sending correspondence: {receipt.ReceiptStatusCode}, {receipt.ReceiptText}");
+                    }                    
                 }
             }
             catch (Exception)
             {
+                //TODO:: log error and add business logic here
                 throw;
             }
-
         }
 
+        /// <summary>
+        /// Initializes a new Correspondence with example values. Values are defined in SendInCorrespondence.config file.      
+        /// </summary>
+        /// <returns></returns>
         public static InsertCorrespondenceV2  CreateCorrespondence()
         {
             InsertCorrespondenceV2 correspondence = new InsertCorrespondenceV2();
@@ -52,7 +91,7 @@ namespace SendInCorrespondence
             {
                 new Notification1
                 {
-                    FromAddress = "no-reply@altinn.no",
+                    FromAddress = ConfigurationManager.AppSettings["fromAddress"],
                     ShipmentDateTime = DateTime.Parse(ConfigurationManager.AppSettings["shipmentDateTime"]),
                     LanguageCode = ConfigurationManager.AppSettings["languageCode"],
                     NotificationType = ConfigurationManager.AppSettings["notificationTemplate"],
