@@ -13,13 +13,13 @@ namespace SendCorrespondenceService
         /// <summary>
         /// Initializes and sends a correspondence
         /// </summary>
-        public static void CreateAndSendCorrespondence(string archiveReference)
+        public static void CreateAndSendCorrespondence(string archiveReference, string reportee)
         {
            InsertCorrespondenceV2 correspondence;
 
             try
             {
-                correspondence = CreateCorrespondence(archiveReference);
+                correspondence = CreateCorrespondence(archiveReference, reportee);
             }
             catch (Exception)
             {
@@ -69,12 +69,12 @@ namespace SendCorrespondenceService
         /// Initializes a new Correspondence with example values. Values are defined in SendInCorrespondence.config file.      
         /// </summary>
         /// <returns></returns>
-        public static InsertCorrespondenceV2 CreateCorrespondence(string archiveReference)
+        public static InsertCorrespondenceV2 CreateCorrespondence(string archiveReference, string reportee)
         {
             InsertCorrespondenceV2 correspondence = new InsertCorrespondenceV2();
             correspondence.ServiceCode = ConfigurationManager.AppSettings["serviceCode"];
             correspondence.ServiceEdition = ConfigurationManager.AppSettings["serviceEdition"];
-            correspondence.Reportee = ConfigurationManager.AppSettings["orgNo"];
+            correspondence.Reportee = reportee;
             correspondence.VisibleDateTime = DateTime.Parse(ConfigurationManager.AppSettings["visibleDateTime"]);
             correspondence.AllowSystemDeleteDateTime = DateTime.Parse(ConfigurationManager.AppSettings["allowSystemDeleteDateTime"]);
             correspondence.DueDateTime = DateTime.Parse(ConfigurationManager.AppSettings["dueDateTime"]);

@@ -15,11 +15,6 @@ namespace IntegrationAMelding
     {
         static void Main()
         {
-            //910190423
-            //TURØY OG FINNØY
-            //03057900961
-            //EINAR NORHEIM
-            //910253492
             var pins = new[]
             {
                 "ajhhs", "piksd", "iuyhs", "asdfg", "rtefs", "loj7s", "mmmyp", "juksa", "fizck", "qicks", "98ujs",

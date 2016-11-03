@@ -63,7 +63,7 @@ namespace SendCorrespondenceService
             DataBatch batch = LoadBatch(filename);
             foreach (DataUnit dataunit in batch.DataUnits)
             {
-                SendCorrespondenceDal.CreateAndSendCorrespondence(dataunit.archiveReference);
+                SendCorrespondenceDal.CreateAndSendCorrespondence(dataunit.archiveReference, dataunit.reportee);
             }
         }
 
