@@ -7,6 +7,7 @@ using IntegrationAMelding.Receipt;
 using System;
 using System.Configuration;
 using System.Linq;
+using System.Threading;
 using ReceiptStatusEnum = IntegrationAMelding.Correspondence.ReceiptStatusEnum;
 
 namespace IntegrationAMelding
@@ -22,27 +23,30 @@ namespace IntegrationAMelding
                 "alsks", "ooiks", "likme", "kaffe", "arbei", "00kks", "mjhgg", "ziste"
             };
 
-            //create and submit FormTask
+            //1. Create and submit FormTask
             int receiptId = SubmitFormTask();
             Console.WriteLine($"Formtask created and sent. ReceiptId: {receiptId}");
 
-            //get archive reference
+            //wait for archive reference
+            Thread.Sleep(5000);
+
+            //2. Get archive reference
             string archiveReference = GetArchiveReference(receiptId);
             Console.WriteLine($"Archive reference: {archiveReference}");
 
+            //3. Use Altinn Pin for authentication - get altinn pin index
             int pinIndex = GetPinIndexForAuthentication();
             Console.WriteLine($"Pin index for authentication: {pinIndex}");
 
             var pin = pins[pinIndex - 1];
             Console.WriteLine($"Pin for authentication: {pin}");
 
-            //get correspondence
+            //4. Get correspondence
             ReporteeElementBEV2 correspondence = GetCorrespondence(pin, archiveReference);
             Console.WriteLine($"Correspondence: {correspondence.ArchiveReference}");
 
-            //archive correspondence
-            ArchiveCorrespondence(pin, correspondence);
-            Console.WriteLine("Correspondence archived.");
+            //5. Archive correspondence
+            ArchiveCorrespondence(pin, correspondence);            
         }
 
         private static int SubmitFormTask()
@@ -66,8 +70,8 @@ namespace IntegrationAMelding
                     DataFormatId = ConfigurationManager.AppSettings["DataFormatId"],
                     DataFormatVersion = int.Parse(ConfigurationManager.AppSettings["DataFormatVersion"]),
                     FormData = ConfigurationManager.AppSettings["formData"],
-                    EndUserSystemReference = "uniqueReferenceee" + DateTime.Now.ToLongTimeString(),
-                    Completed = true
+                    EndUserSystemReference = "uniqueReferenceee" + DateTime.Now.ToLongTimeString(),                    
+                    Completed = true                    
                 };
 
                 var formList = new Form[1];
@@ -206,11 +210,12 @@ namespace IntegrationAMelding
                         throw new InvalidOperationException($"{receipt.ReceiptStatusCode} : {receipt.ReceiptText}");
                     }
                 }
+
+                Console.WriteLine("Correspondence archived.");
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"Failed to get correspondence: {exception.Message}");
-                throw;
+                Console.WriteLine($"Failed to archive correspondence: {exception.Message}");                
             }
         }
     }
