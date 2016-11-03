@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Configuration;
+using System.Diagnostics;
 using SendCorrespondenceService.ICorrespondenceAgencyExternalBasic;
-
+using SendCorrespondenceService.Utils;
 
 namespace SendCorrespondenceService
 {
@@ -21,9 +22,9 @@ namespace SendCorrespondenceService
             {
                 correspondence = CreateCorrespondence(archiveReference, reportee);
             }
-            catch (Exception)
-            {
-                //TODO:: log error - failed to initialize correspondence
+            catch (Exception exception)
+            {                
+                Logger.Log($"Failed to initialize correspondence {exception.Message}");
                 throw;
             }
 
@@ -40,27 +41,25 @@ namespace SendCorrespondenceService
         /// <param name="correspondence">Correspondence to send</param>
         public static void SendCorrespondence(string systemUserName, string systemPassword, string systemUserCode, string externalShipmentReferece, InsertCorrespondenceV2 correspondence)
         {
-            ReceiptExternal receipt;
-
             try
             {
                 using (CorrespondenceAgencyExternalBasicClient client = new CorrespondenceAgencyExternalBasicClient())
                 {
-                    receipt = client.InsertCorrespondenceBasicV2(systemUserName, systemPassword, systemUserCode, externalShipmentReferece, correspondence);
+                    var receipt = client.InsertCorrespondenceBasicV2(systemUserName, systemPassword, systemUserCode, externalShipmentReferece, correspondence);
                     if (receipt.ReceiptStatusCode == ReceiptStatusEnum.OK)
                     {
-                        //TODO:: log success and add business logic here
+                        Logger.Log($"Correspondence sent successfully for reportee: {correspondence.Reportee} and reference: {correspondence.ArchiveReference}", false, EventLogEntryType.Information);
                     }
                     else
                     {
-                        //TODO:: log error and add business logic here
-                        throw new Exception($"Error while sending correspondence: {receipt.ReceiptStatusCode.ToString()}, {receipt.ReceiptText}");
+                        Logger.Log($"Failed to send correspondence for reportee: {correspondence.Reportee} and reference: {correspondence.ArchiveReference}");
+                        throw new Exception($"Error while sending correspondence: {receipt.ReceiptStatusCode}, {receipt.ReceiptText}");
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception exception)
             {
-                //TODO:: log error and add business logic here
+                Logger.Log($"Failed to send correspondence for reportee: {correspondence.Reportee} and reference: {correspondence.ArchiveReference}, message: {exception.Message}");
                 throw;
             }
         }

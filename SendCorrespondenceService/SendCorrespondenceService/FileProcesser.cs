@@ -8,13 +8,13 @@ namespace SendCorrespondenceService
 {
     public class FileProcesser
     {
-        FileSystemWatcher watcher;
-        string directoryToWatch;
+        readonly FileSystemWatcher watcher;
+        readonly string directoryToWatch;
 
         public FileProcesser(string path)
         {
-            this.watcher = new FileSystemWatcher();
-            this.directoryToWatch = path;
+            watcher = new FileSystemWatcher();
+            directoryToWatch = path;
         }
 
         public void Watch()
@@ -24,13 +24,12 @@ namespace SendCorrespondenceService
                                    NotifyFilters.LastWrite |
                                    NotifyFilters.FileName |
                                    NotifyFilters.DirectoryName;
-            watcher.Filter = "*.*";
-            //watcher.Changed += new FileSystemEventHandler(OnChanged);
-            watcher.Created += new FileSystemEventHandler(OnChanged);
+            watcher.Filter = "*.*";            
+            watcher.Created += new FileSystemEventHandler(OnCreated);
             watcher.EnableRaisingEvents = true;
         }
 
-        private void OnChanged(object sender, FileSystemEventArgs e)
+        private void OnCreated(object sender, FileSystemEventArgs e)
         {
             string toPath;
 
@@ -41,21 +40,29 @@ namespace SendCorrespondenceService
                 toPath = ConfigurationManager.AppSettings["ToPath"];
 
                 if (!Directory.Exists(toPath))
-                    Directory.CreateDirectory(toPath);                
+                    Directory.CreateDirectory(toPath);
             }
-            catch (Exception)
+            catch (Exception exception)
             {
+                Logger.Log($"Failed to process Altinn batch. File will be moved to proper directory. Message: {exception.Message}");
+
                 toPath = ConfigurationManager.AppSettings["ToPathFailed"];
 
                 if (!Directory.Exists(toPath))
                     Directory.CreateDirectory(toPath);
             }
 
-            File.Copy(e.FullPath, Path.Combine(toPath, Path.GetFileName(e.FullPath)), true);
-            File.Delete(e.FullPath);
+            try
+            {
+                if (e.FullPath == null) return;
 
-
-
+                File.Copy(e.FullPath, Path.Combine(toPath, Path.GetFileName(e.FullPath)), true);
+                File.Delete(e.FullPath);
+            }
+            catch (Exception exception)
+            {                
+                Logger.Log($"Failed to move (copy/delete) processed file to target location. Error message: {exception.Message}");
+            }            
         }
 
         private void CreateAndSendCorrespondence(string filename)

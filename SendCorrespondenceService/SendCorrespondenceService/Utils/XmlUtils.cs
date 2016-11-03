@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace SendCorrespondenceService.Utils
@@ -26,7 +25,7 @@ namespace SendCorrespondenceService.Utils
         /// </summary>
         /// <typeparam name="T">T</typeparam>
         /// <param name="serializer">The XmlSerializer object</param>
-        /// <param name="batch">batch as string</param>
+        /// <param name="data">data as string</param>
         /// <returns>T</returns>
         public static T DeserializeXmlString<T>(XmlSerializer serializer, string data)
         {
@@ -35,18 +34,6 @@ namespace SendCorrespondenceService.Utils
             using (TextReader reader = new StringReader(data))
             {
                 result = (T) serializer.Deserialize(reader);
-            }
-
-            return result;
-        }
-
-        public static T DeserializeXmlString<T>(XmlSerializer serializer, XElement data)
-        {
-            T result;
-
-            using (TextReader reader = new StringReader(data.FirstNode.ToString()))
-            {
-                result = (T)serializer.Deserialize(reader);
             }
 
             return result;
