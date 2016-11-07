@@ -13,5 +13,5 @@ To install this windows service perform the following:
 This service is setup to run on manual start, therefore you need to start the service manually after the installation.
 
 1. Open Service explorer
-2. Find SendInCorrespondence service
+2. Find SendCorrespondenceService
 3. Start the service
