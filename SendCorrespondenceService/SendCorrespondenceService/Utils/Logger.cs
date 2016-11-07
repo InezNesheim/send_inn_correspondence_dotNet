@@ -83,7 +83,7 @@ namespace SendCorrespondenceService.Utils
         /// <remarks>
         /// We have chosen here a simple log to file, but other logging strategies could be implemented, such as using NLog or logging to Application Event Log only.
         /// </remarks>
-        public static void Log(string msg, bool logToEvent = false, EventLogEntryType logEntryType = EventLogEntryType.Error)
+        public static void Log(string msg, bool logToEvent = true, EventLogEntryType logEntryType = EventLogEntryType.Error)
         {
             lock (semaphore)
             {

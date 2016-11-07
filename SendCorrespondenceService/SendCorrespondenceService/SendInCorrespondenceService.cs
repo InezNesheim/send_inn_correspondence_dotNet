@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
+using System.IO;
 using System.ServiceProcess;
 
 namespace SendCorrespondenceService
@@ -14,12 +16,6 @@ namespace SendCorrespondenceService
         }
 
         protected override void OnStart(string[] args)
-        {
-            //fp = new FileProcesser(ConfigurationManager.AppSettings["FromPath"]);
-            //fp.Watch();
-        }
-
-        internal void OnStart(object p)
         {
             fp = new FileProcesser(ConfigurationManager.AppSettings["FromPath"]);
             fp.Watch();
